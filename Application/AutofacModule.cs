@@ -5,7 +5,8 @@ using Gateway.Services;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using MediatR.Extensions.Autofac.DependencyInjection.Builder;
 using System.Reflection;
-
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("UnitTests")]
 namespace Application
 {
     public class AutofacApplicationModule : Autofac.Module
