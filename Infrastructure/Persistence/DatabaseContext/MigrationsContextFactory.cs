@@ -16,7 +16,7 @@ namespace Infrastructure.Persistence.DatabaseContext
                 .Build();
 
             var builder = new DbContextOptionsBuilder<AggreegationDbContext>();
-            builder.UseSqlite(configuration.GetConnectionString(Constants.Databases.Employees));
+            builder.UseSqlite(configuration.GetConnectionString(Constants.Databases.Aggregation));
 
             return new AggreegationDbContext(builder.Options);
         }

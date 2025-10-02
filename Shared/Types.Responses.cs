@@ -1,4 +1,6 @@
-﻿namespace Shared
+﻿using System.Text.Json.Serialization;
+
+namespace Shared
 {
     public class AggregationModel
     {
@@ -27,6 +29,17 @@
             Name = name;
             Email = email;
             Body = body;
+        }
+    }
+
+    public class RecipesResponse
+    {
+        public List<RecipeModel> Recipes { get;}
+
+        [JsonConstructor]
+        public RecipesResponse(List<RecipeModel> recipes)
+        {
+            Recipes = recipes;
         }
     }
 

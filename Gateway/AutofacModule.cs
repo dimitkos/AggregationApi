@@ -8,7 +8,7 @@ namespace Gateway
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .RegisterGeneric(typeof(ApiClient<,>))
+                .RegisterGeneric(typeof(ApiClient<>))
                 .AsImplementedInterfaces()
                 .SingleInstance();
         }

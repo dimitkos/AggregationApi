@@ -7,12 +7,12 @@ using System.Web;
 
 namespace Gateway.Api
 {
-    public interface IApiClient<TRequest, TResponse>
+    public interface IApiClient<TResponse>
     {
         Task<TResponse> Get(string relativePath, string clientName, IDictionary<string, string>? queryStringParams = null);
     }
 
-    public class ApiClient<TRequest, TResponse> : IApiClient<TRequest, TResponse>
+    public class ApiClient<TResponse> : IApiClient<TResponse>
     {
         private readonly IHttpClientFactory _clientFactory;
 
