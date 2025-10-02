@@ -22,6 +22,10 @@ namespace Infrastructure
                .As(typeof(ICacheAdapter<,>))
                .SingleInstance();
 
+            builder
+                .RegisterType<AggregatesPersistence>()
+                .As<IAggregatesPersistence>()
+                .SingleInstance();
         }
     }
 }

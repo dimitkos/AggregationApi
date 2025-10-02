@@ -1,4 +1,5 @@
 ﻿using Application.Behaviors;
+using Application.Services;
 using Autofac;
 using MediatR.Extensions.Autofac.DependencyInjection;
 using MediatR.Extensions.Autofac.DependencyInjection.Builder;
@@ -20,6 +21,11 @@ namespace Application
                 .Build();
 
             builder.RegisterMediatR(configuration);
+
+            builder
+                .RegisterType<AggregatorDataService>()
+                .As<IAggregatorDataService>()
+                .SingleInstance();
         }
     }
 }

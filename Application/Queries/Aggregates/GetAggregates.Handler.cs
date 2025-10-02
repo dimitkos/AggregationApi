@@ -1,34 +1,25 @@
-﻿using Application.Services.Infrastructure;
-using Common;
+﻿using Application.Services;
+using Application.Services.Infrastructure;
 using Domain.Aggregates;
-using Gateway;
-using Gateway.Api;
 using MediatR;
-using Microsoft.Extensions.Options;
 using Shared;
 
 namespace Application.Queries.Aggregates
 {
-    public class GetAggregatesHandler : IRequestHandler<GetAggregates, AggregationModel>
+    class GetAggregatesHandler : IRequestHandler<GetAggregates, AggregationModel>
     {
-        private readonly IApiClient<List<CommentModel>> _commentApi;
-        private readonly IApiClient<RecipesResponse> _recipeApi;
+        private readonly IAggregatorDataService _aggregator;
         private readonly IAggregatesPersistence _persistence;
         private readonly ICacheAdapter<string, AggregationModel> _cacheAdapter;
-        private readonly ApiConfiguration _apiConfiguration;
-        private const string CacheKey = "aggregated_data";
+        private const string CacheKey = "aggregated";
 
         public GetAggregatesHandler(
+            IAggregatorDataService aggregator,
             ICacheAdapter<string, AggregationModel> cacheAdapter,
-            IApiClient<List<CommentModel>> commentApi,
-            IApiClient<RecipesResponse> recipeApi,
-            IAggregatesPersistence persistence,
-            IOptions<ApiConfiguration> options)
+            IAggregatesPersistence persistence)
         {
-            _commentApi = commentApi;
-            _recipeApi = recipeApi;
+            _aggregator = aggregator;
             _persistence = persistence;
-            _apiConfiguration = options.Value;
             _cacheAdapter = cacheAdapter;
         }
 
@@ -39,27 +30,15 @@ namespace Application.Queries.Aggregates
             if (cachedResult is not null)
                 return cachedResult;
 
-            var model = await GetData();
+            var model = await _aggregator.Fetch();
 
             var entity = MapTo(model.Comments, model.Recipes);
             await _persistence.StoreAllAggregates(entity);
 
+            //maybe use a decorator for caching?
             _cacheAdapter.Set(CacheKey, model);
 
             return model;
-        }
-
-        private async Task<AggregationModel> GetData()
-        {
-            var commentsTask = _commentApi.Get(_apiConfiguration.CommentsUrl, Constants.HttpClients.Comments);
-            var recipesTask = _recipeApi.Get(_apiConfiguration.RecipesUrl, Constants.HttpClients.Recipes);
-
-            await Task.WhenAll(commentsTask, recipesTask);
-
-            var comments = commentsTask.Result;
-            var recipes = recipesTask.Result;
-
-            return new AggregationModel(commentsTask.Result, recipesTask.Result.Recipes);
         }
 
 #warning make it mapper utils

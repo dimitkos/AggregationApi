@@ -20,6 +20,7 @@ namespace Infrastructure.Cache
 
         public TEntity? TryGet(TKey key)
         {
+            var tt = ToCacheKey(key);
             if (_cache.TryGetValue(ToCacheKey(key), out var value))
                 return (TEntity)value;
 
