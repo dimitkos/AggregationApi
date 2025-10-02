@@ -1,0 +1,4 @@
+﻿Add-Migration [MigrationName] -Context AggreegationDbContext -OutputDir Persistence\DatabaseContext\Migrations
+Remove-Migration -context AggreegationDbContext 
+Update-Database -context AggreegationDbContext 
+Script-Migration -From [OldMigrationName] -To [NewMigrationName] -Context AggreegationDbContext 
