@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/employees")]
+    [Route("api/aggregation")]
     public class AggregationController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -15,11 +16,11 @@ namespace Api.Controllers
         }
 
         [HttpGet("GetAggregates")]
-        [ProducesResponseType(typeof(string[]), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(AggregationModel), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAggregates()
         {
-            //string[] employees = await _mediator.Send(new GetAllEmployees());
-            return Ok();
+            AggregationModel result = await _mediator.Send(new GetAggregates());
+            return Ok(result);
         }
     }
 }

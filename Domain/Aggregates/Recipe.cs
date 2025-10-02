@@ -21,3 +21,4 @@
             CaloriesPerServing = caloriesPerServing;
         }
     }
+}

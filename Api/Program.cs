@@ -121,8 +121,6 @@ namespace Api
 
         private static void RegisterCaching(IServiceCollection services)
         {
-#warning
-            //keep in mind to choose if want redis or memorycache
             services.AddMemoryCache();
         }
     }
