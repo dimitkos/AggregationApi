@@ -14,36 +14,43 @@ namespace Application.Queries.Aggregates
         private readonly IApiClient<List<CommentModel>> _commentApi;
         private readonly IApiClient<RecipesResponse> _recipeApi;
         private readonly IAggregatesPersistence _persistence;
+        private readonly ICacheAdapter<string, AggregationModel> _cacheAdapter;
         private readonly ApiConfiguration _apiConfiguration;
-        //private readonly IMemoryCache _cache;
-        //private readonly MemoryCacheEntryOptions _cacheOptions;
-        //private readonly CacheSettings _cacheSettings;
         private const string CacheKey = "aggregated_data";
 
         public GetAggregatesHandler(
-            //IMemoryCache cache, 
-            //MemoryCacheEntryOptions cacheOptions,
-            //IOptions<CacheSettings> optionsCache,
+            ICacheAdapter<string, AggregationModel> cacheAdapter,
             IApiClient<List<CommentModel>> commentApi,
             IApiClient<RecipesResponse> recipeApi,
             IAggregatesPersistence persistence,
             IOptions<ApiConfiguration> options)
         {
-            //_cache = cache;
-            //_cacheSettings = optionsCache.Value;
-            //_cacheOptions = new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.SlidingExpiration), AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_cacheSettings.AbsoluteExpiration) };
             _commentApi = commentApi;
             _recipeApi = recipeApi;
             _persistence = persistence;
             _apiConfiguration = options.Value;
+            _cacheAdapter = cacheAdapter;
         }
 
-        public async Task<AggregationModel?> Handle(GetAggregates request, CancellationToken cancellationToken)
+        public async Task<AggregationModel> Handle(GetAggregates request, CancellationToken cancellationToken)
         {
-            // 1. Try cache
-            //if (_cache.TryGetValue(CacheKey, out AggregationModel? cached))
-            //    return Task.FromResult(cached);
+            var cachedResult = _cacheAdapter.TryGet(CacheKey);
 
+            if (cachedResult is not null)
+                return cachedResult;
+
+            var model = await GetData();
+
+            var entity = MapTo(model.Comments, model.Recipes);
+            await _persistence.StoreAllAggregates(entity);
+
+            _cacheAdapter.Set(CacheKey, model);
+
+            return model;
+        }
+
+        private async Task<AggregationModel> GetData()
+        {
             var commentsTask = _commentApi.Get(_apiConfiguration.CommentsUrl, Constants.HttpClients.Comments);
             var recipesTask = _recipeApi.Get(_apiConfiguration.RecipesUrl, Constants.HttpClients.Recipes);
 
@@ -51,17 +58,12 @@ namespace Application.Queries.Aggregates
 
             var comments = commentsTask.Result;
             var recipes = recipesTask.Result;
-            AggregationEntity entity = MapTo(comments, recipes);
-            await _persistence.StoreAllAggregates(entity);
 
-            //set in the cache for next time
-            //_cache.Set(CacheKey, result);
-
-            return new AggregationModel(comments, recipes.Recipes);
+            return new AggregationModel(commentsTask.Result, recipesTask.Result.Recipes);
         }
 
 #warning make it mapper utils
-        private static AggregationEntity MapTo(List<CommentModel> commentsModel, RecipesResponse recipesModel)
+        private static AggregationEntity MapTo(List<CommentModel> commentsModel, List<RecipeModel> recipesModel)
         {
             var comments = commentsModel
                 .Select(x => new Comment(
@@ -72,7 +74,7 @@ namespace Application.Queries.Aggregates
                     body: x.Body))
                 .ToArray();
 
-            var recipes = recipesModel.Recipes
+            var recipes = recipesModel
                 .Select(x => new Recipe(
                     id: x.Id,
                     name: x.Name,

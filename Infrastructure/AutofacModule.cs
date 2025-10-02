@@ -1,5 +1,6 @@
 ﻿using Application.Services.Infrastructure;
 using Autofac;
+using Infrastructure.Cache;
 using Infrastructure.Persistence.Commands.Aggregates;
 using System.Reflection;
 
@@ -15,6 +16,11 @@ namespace Infrastructure
                 .RegisterType<AggregatesPersistence>()
                 .As<IAggregatesPersistence>()
                 .SingleInstance();
+
+            builder
+               .RegisterGeneric(typeof(CacheAdapter<,>))
+               .As(typeof(ICacheAdapter<,>))
+               .SingleInstance();
 
         }
     }
