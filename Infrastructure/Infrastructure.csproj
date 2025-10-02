@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Configuration\" />
     <Folder Include="Persistence\DatabaseContext\Migrations\" />
     <Folder Include="Persistence\Queries\Queries\" />
   </ItemGroup>

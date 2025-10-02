@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using Application.Services.Infrastructure;
+using Autofac;
+using Infrastructure.Persistence.Commands.Aggregates;
 using System.Reflection;
 
 namespace Infrastructure
@@ -8,6 +10,11 @@ namespace Infrastructure
         protected override void Load(ContainerBuilder builder)
         {
             var thisAssembly = Assembly.GetExecutingAssembly();
+
+            builder
+                .RegisterType<AggregatesPersistence>()
+                .As<IAggregatesPersistence>()
+                .SingleInstance();
 
         }
     }
