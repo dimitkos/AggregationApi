@@ -64,4 +64,24 @@ namespace Shared
             CaloriesPerServing = caloriesPerServing;
         }
     }
+
+    public class StatisticsModel
+    {
+        public int TotalRequests { get; }
+        public double TotalResponseTimeMs { get; }
+        public int FastCount { get; }
+        public int AverageCount { get; }
+        public int SlowCount { get; }
+        public double AverageResponseTime { get; }
+
+        public StatisticsModel(int totalRequests, double totalResponseTimeMs, int fastCount, int averageCount, int slowCount, double averageResponseTime)
+        {
+            TotalRequests = totalRequests;
+            TotalResponseTimeMs = totalResponseTimeMs;
+            FastCount = fastCount;
+            AverageCount = averageCount;
+            SlowCount = slowCount;
+            AverageResponseTime = averageResponseTime;
+        }
+    }
 }
