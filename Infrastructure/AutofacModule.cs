@@ -2,6 +2,7 @@
 using Autofac;
 using Infrastructure.Cache;
 using Infrastructure.Persistence.Commands.Aggregates;
+using Infrastructure.Persistence.Commands.Users;
 using System.Reflection;
 
 namespace Infrastructure
@@ -23,8 +24,18 @@ namespace Infrastructure
                .SingleInstance();
 
             builder
+                .RegisterAssemblyTypes(thisAssembly)
+                .AsClosedTypesOf(typeof(IEntityRetrieval<,>))
+                .SingleInstance();
+
+            builder
                 .RegisterType<AggregatesPersistence>()
                 .As<IAggregatesPersistence>()
+                .SingleInstance();
+
+            builder
+                .RegisterType<UserPersistence>()
+                .As<IUserPersistence>()
                 .SingleInstance();
         }
     }

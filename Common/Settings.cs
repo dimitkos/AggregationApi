@@ -25,4 +25,16 @@ namespace Common
         [Required]
         public string CronExpression { get; set; }
     }
+
+    public class JwtSettings
+    {
+        [Required]
+        public string Secret { get; set; }
+        [Required]
+        public string Issuer { get; set; }
+        [Required]
+        public string Audience { get; set; }
+        [Required]
+        public int ExpirationInMinutes { get; set; }
+    }
 }

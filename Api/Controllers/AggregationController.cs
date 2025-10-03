@@ -1,11 +1,13 @@
 ﻿using Application.Queries.Aggregates;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
 namespace Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/aggregation")]
     public class AggregationController : ControllerBase
     {

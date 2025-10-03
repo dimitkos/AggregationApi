@@ -1,11 +1,13 @@
 ﻿using Application.Queries.Statistics;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 
 namespace Api.Controllers
 {
     [ApiController]
+    [Authorize]
     [Route("api/statistics")]
     public class StatisticsController : ControllerBase
     {

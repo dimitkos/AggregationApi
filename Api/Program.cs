@@ -9,11 +9,14 @@ using Gateway;
 using IdGen.DependencyInjection;
 using Infrastructure;
 using Infrastructure.Persistence.DatabaseContext;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Polly;
 using Quartz;
 using Serilog;
 using System.Reflection;
+using System.Text;
 
 namespace Api
 {
@@ -79,6 +82,19 @@ namespace Api
             RegisterQuartz(services, configuration);
 
             services.AddAuthorization();
+            var jwtSettings = configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(o =>
+                {
+                    o.RequireHttpsMetadata = false;
+                    o.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Secret!)),
+                        ValidIssuer = jwtSettings!.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
 
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
@@ -98,6 +114,8 @@ namespace Api
 
             app.UseRouting();
             app.UseMiddleware<ExceptionsMiddleware>();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseSwagger();
@@ -117,6 +135,7 @@ namespace Api
             services.AddOptions<CacheSettings>().Bind(configuration.GetSection(nameof(CacheSettings))).ValidateDataAnnotations();
             services.AddOptions<ApiConfiguration>().Bind(configuration.GetSection(nameof(ApiConfiguration))).ValidateDataAnnotations();
             services.AddOptions<StatisticsPerformanceConfigurationJob>().Bind(configuration.GetSection(nameof(StatisticsPerformanceConfigurationJob))).ValidateDataAnnotations();
+            services.AddOptions<JwtSettings>().Bind(configuration.GetSection(nameof(JwtSettings))).ValidateDataAnnotations();
         }
 
         private static void RegisterAutofacModules(ContainerBuilder builder)

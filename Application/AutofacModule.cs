@@ -33,6 +33,16 @@ namespace Application
                 .RegisterType<StatisticsService>()
                 .As<IStatisticsService>()
                 .SingleInstance();
+
+            builder
+                .RegisterType<PasswordHasher>()
+                .As<IPasswordHasher>()
+                .SingleInstance();
+
+            builder
+                .RegisterType<TokenProvider>()
+                .As<ITokenProvider>()
+                .SingleInstance();
         }
     }
 }
