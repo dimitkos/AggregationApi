@@ -1,5 +1,6 @@
 using Api.Middlewares;
 using Application;
+using Application.Jobs;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Common;
@@ -9,8 +10,8 @@ using IdGen.DependencyInjection;
 using Infrastructure;
 using Infrastructure.Persistence.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Polly;
+using Quartz;
 using Serilog;
 using System.Reflection;
 
@@ -62,7 +63,9 @@ namespace Api
             services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(AutofacApplicationModule)));
 
             var apiInstanceSettings = configuration.GetSection(nameof(ApiInstanceSettings)).Get<ApiInstanceSettings>();
-            services.AddIdGen(apiInstanceSettings.IdConfiguration);
+            services.AddIdGen(apiInstanceSettings!.IdConfiguration);
+
+            RegisterQuartz(services, configuration);
 
             services.AddAuthorization();
 
@@ -72,6 +75,8 @@ namespace Api
             RegisterConfiguration(services, configuration);
             RegisterDatabase(services, configuration);
             RegisterCaching(services);
+
+            services.AddQuartzHostedService();
         }
 
 
@@ -100,6 +105,7 @@ namespace Api
             services.AddOptions<ApiInstanceSettings>().Bind(configuration.GetSection(nameof(ApiInstanceSettings))).ValidateDataAnnotations();
             services.AddOptions<CacheSettings>().Bind(configuration.GetSection(nameof(CacheSettings))).ValidateDataAnnotations();
             services.AddOptions<ApiConfiguration>().Bind(configuration.GetSection(nameof(ApiConfiguration))).ValidateDataAnnotations();
+            services.AddOptions<StatisticsPerformanceConfigurationJob>().Bind(configuration.GetSection(nameof(StatisticsPerformanceConfigurationJob))).ValidateDataAnnotations();
         }
 
         private static void RegisterAutofacModules(ContainerBuilder builder)
@@ -117,6 +123,22 @@ namespace Api
 
             services
                 .AddDbContext<AggreegationDbContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Transient);
+        }
+
+        private static void RegisterQuartz(IServiceCollection services, ConfigurationManager configuration)
+        {
+            services.AddQuartz(q =>
+            {
+                var jobKey = new JobKey(typeof(StatitisticsPerformanceJob).FullName!);
+                q.AddJob<StatitisticsPerformanceJob>(opts => opts.WithIdentity(jobKey));
+
+                var jobConfiguration = configuration.GetSection(nameof(StatisticsPerformanceConfigurationJob)).Get<StatisticsPerformanceConfigurationJob>();
+
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity(new TriggerKey(typeof(StatitisticsPerformanceJob).FullName!))
+                    .WithCronSchedule(jobConfiguration!.CronExpression));
+            });
         }
 
         private static void RegisterCaching(IServiceCollection services)

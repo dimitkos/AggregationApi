@@ -2,6 +2,8 @@
 {
     public class Statistics
     {
+        private readonly List<(DateTime Timestamp, double ElapsedMs)> _recentRequests = new();
+
         public int TotalRequests { get; private set; }
         public double TotalResponseTimeMs { get; private set; }
         public int FastCount { get; private set; }
@@ -24,7 +26,7 @@
             return new Statistics(0, 0, 0, 0, 0, 0);
         }
 
-        public Statistics Update(double elapsedMs)
+        public void Update(double elapsedMs)
         {
             TotalRequests++;
             TotalResponseTimeMs += elapsedMs;
@@ -38,13 +40,19 @@
 
             AverageResponseTime = TotalRequests == 0 ? 0 : TotalResponseTimeMs / TotalRequests;
 
-            return new Statistics(
-                TotalRequests,
-                TotalResponseTimeMs,
-                FastCount,
-                AverageCount,
-                SlowCount,
-                AverageResponseTime);
+            _recentRequests.Add((DateTime.UtcNow, elapsedMs));
+            _recentRequests.RemoveAll(x => x.Timestamp < DateTime.UtcNow.AddMinutes(-15));
+        }
+
+        public double GetLastMinutesAverage(int minutes)
+        {
+            var time = DateTime.UtcNow.AddMinutes(-minutes);
+            var recent = _recentRequests.Where(x => x.Timestamp >= time).ToList();
+
+            if (!recent.Any()) 
+                return 0;
+
+            return recent.Average(x => x.ElapsedMs);
         }
     }
 }
