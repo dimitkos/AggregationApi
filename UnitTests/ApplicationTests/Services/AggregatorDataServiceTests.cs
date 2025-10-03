@@ -1,5 +1,6 @@
 ﻿using Application.Services;
 using Application.Services.Infrastructure;
+using Domain.Aggregates;
 using Gateway;
 using Gateway.Api;
 using Microsoft.Extensions.Options;
@@ -17,22 +18,29 @@ namespace UnitTests.ApplicationTests.Services
             var comments = new List<CommentModel> { new CommentModel(1, 1, "name", "email", "body") };
             var recipes = new List<RecipeModel> { new RecipeModel(1, "recipe", 10, 20, "Easy", "Italian", 100) };
             var recipesResponse = new RecipesResponse(recipes);
+            var main = new Main { Temp = 67.3, Humidity = 55 };
+            var weather = new WeatherModel { Name = "Athens", Main = main };
 
             var commentApiMock = new Mock<IApiClient<List<CommentModel>>>();
             var recipeApiMock = new Mock<IApiClient<RecipesResponse>>();
+            var weatherApiMock = new Mock<IApiClient<WeatherModel>>();
+
             var cacheAdapterMock = new Mock<ICacheAdapter<string, AggregationModel>>();
             var persistenceMock = new Mock<IAggregatesPersistence>();
-            var config = new ApiConfiguration { CommentsUrl = "comments", RecipesUrl = "recipes" };
+
+            var config = new ApiConfiguration { CommentsUrl = "comments", RecipesUrl = "recipes" , WeatherUrl = "weather" };
             var optionsMock = new Mock<IOptions<ApiConfiguration>>();
             optionsMock.Setup(o => o.Value).Returns(config);
 
             commentApiMock.Setup(x => x.Get(config.CommentsUrl, It.IsAny<string>(), null)).ReturnsAsync(comments);
             recipeApiMock.Setup(x => x.Get(config.RecipesUrl, It.IsAny<string>(), null)).ReturnsAsync(recipesResponse);
+            weatherApiMock.Setup(x => x.Get(config.WeatherUrl, It.IsAny<string>(), null)).ReturnsAsync(weather);
 
             var service = new AggregatorDataService(
                 cacheAdapterMock.Object,
                 commentApiMock.Object,
                 recipeApiMock.Object,
+                weatherApiMock.Object,
                 persistenceMock.Object,
                 optionsMock.Object);
 
@@ -51,6 +59,8 @@ namespace UnitTests.ApplicationTests.Services
             // Arrange
             var commentApiMock = new Mock<IApiClient<List<CommentModel>>>();
             var recipeApiMock = new Mock<IApiClient<RecipesResponse>>();
+            var weatherApiMock = new Mock<IApiClient<WeatherModel>>();
+
             var cacheAdapterMock = new Mock<ICacheAdapter<string, AggregationModel>>();
             var persistenceMock = new Mock<IAggregatesPersistence>();
             var config = new ApiConfiguration { CommentsUrl = "comments", RecipesUrl = "recipes" };
@@ -59,11 +69,13 @@ namespace UnitTests.ApplicationTests.Services
 
             commentApiMock.Setup(x => x.Get(config.CommentsUrl, It.IsAny<string>(), null)).ReturnsAsync(new List<CommentModel>());
             recipeApiMock.Setup(x => x.Get(config.RecipesUrl, It.IsAny<string>(), null)).ReturnsAsync(new RecipesResponse(new List<RecipeModel>()));
+            weatherApiMock.Setup(x => x.Get(config.WeatherUrl, It.IsAny<string>(), null)).ReturnsAsync(new WeatherModel());
 
             var service = new AggregatorDataService(
                 cacheAdapterMock.Object,
                 commentApiMock.Object,
                 recipeApiMock.Object,
+                weatherApiMock.Object, 
                 persistenceMock.Object,
                 optionsMock.Object);
 

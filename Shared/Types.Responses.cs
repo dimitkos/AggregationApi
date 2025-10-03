@@ -6,11 +6,13 @@ namespace Shared
     {
         public List<CommentModel> Comments { get; }
         public List<RecipeModel> Recipes { get; }
+        public WeatherModel Weather { get; }
 
-        public AggregationModel(List<CommentModel> comments, List<RecipeModel> recipes)
+        public AggregationModel(List<CommentModel> comments, List<RecipeModel> recipes, WeatherModel weather)
         {
             Comments = comments;
             Recipes = recipes;
+            Weather = weather;
         }
     }
 
@@ -95,5 +97,25 @@ namespace Shared
             AverageResponseTime = averageResponseTime;
             RecentRequests = recentRequests;
         }
+    }
+
+    public class WeatherModel
+    {
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [JsonPropertyName("main")]
+        public Main Main { get; set; }
+
+        public double Temp => Main.Temp;
+        public double Humidity => Main.Humidity;
+    }
+
+    public class Main
+    {
+        [JsonPropertyName("temp")]
+        public double Temp { get; set; }
+        [JsonPropertyName("humidity")]
+        public double Humidity { get; set; }
     }
 }

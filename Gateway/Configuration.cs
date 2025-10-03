@@ -8,5 +8,7 @@ namespace Gateway
         public string CommentsUrl { get; set; }
         [Required]
         public string RecipesUrl { get; set; }
+        [Required]
+        public string WeatherUrl { get; set; }
     }
 }

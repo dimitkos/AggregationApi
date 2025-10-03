@@ -60,6 +60,17 @@ namespace Api
                 .AddTransientHttpErrorPolicy(policyBuilder =>
                     policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
 
+            services.AddHttpClient(Constants.HttpClients.Weather, client =>
+            {
+                client.BaseAddress = new Uri("https://covid-19-statistics.p.rapidapi.com/");
+                client.DefaultRequestHeaders.Add("x-rapidapi-host", "open-weather13.p.rapidapi.com");
+                client.DefaultRequestHeaders.Add("x-rapidapi-key", "993951f1femsh7d3ffa8e32bde96p13bfbcjsn1a87a610f908");
+            })
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
             services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(AutofacApplicationModule)));
 
             var apiInstanceSettings = configuration.GetSection(nameof(ApiInstanceSettings)).Get<ApiInstanceSettings>();
