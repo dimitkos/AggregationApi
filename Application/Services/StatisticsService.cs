@@ -13,7 +13,7 @@ namespace Application.Services
         {
             //_stats.AddOrUpdate(apiName,_ => Statistics.Initialize().Update(elapsedMs),(_, existing) => existing.Update(elapsedMs));
 
-            var stat = _stats.GetOrAdd(apiName, _ => Statistics.Initialize());
+            var stat = _stats.GetOrAdd(apiName, _ => Statistics.Initialize(apiName));
 
             lock (stat)
             {
@@ -25,12 +25,14 @@ namespace Application.Services
             _stats.ToDictionary(
                 kvp => kvp.Key,
                 kvp => new StatisticsModel(
+                    kvp.Value.ApiName,
                     kvp.Value.TotalRequests,
                     kvp.Value.TotalResponseTimeMs,
                     kvp.Value.FastCount,
                     kvp.Value.AverageCount,
                     kvp.Value.SlowCount,
-                    kvp.Value.AverageResponseTime
+                    kvp.Value.AverageResponseTime,
+                    kvp.Value.RecentRequests
                 )
             );
 
