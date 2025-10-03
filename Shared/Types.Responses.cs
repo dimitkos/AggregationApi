@@ -67,21 +67,33 @@ namespace Shared
 
     public class StatisticsModel
     {
+        public string ApiName { get; }
         public int TotalRequests { get; }
         public double TotalResponseTimeMs { get; }
         public int FastCount { get; }
         public int AverageCount { get; }
         public int SlowCount { get; }
         public double AverageResponseTime { get; }
+        public IReadOnlyList<(DateTime Timestamp, double ElapsedMs)> RecentRequests { get; }
 
-        public StatisticsModel(int totalRequests, double totalResponseTimeMs, int fastCount, int averageCount, int slowCount, double averageResponseTime)
+        public StatisticsModel(
+            string apiName,
+            int totalRequests,
+            double totalResponseTimeMs,
+            int fastCount,
+            int averageCount,
+            int slowCount,
+            double averageResponseTime,
+            IReadOnlyList<(DateTime Timestamp, double ElapsedMs)> recentRequests)
         {
+            ApiName = apiName;
             TotalRequests = totalRequests;
             TotalResponseTimeMs = totalResponseTimeMs;
             FastCount = fastCount;
             AverageCount = averageCount;
             SlowCount = slowCount;
             AverageResponseTime = averageResponseTime;
+            RecentRequests = recentRequests;
         }
     }
 }

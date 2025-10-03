@@ -4,15 +4,18 @@
     {
         private readonly List<(DateTime Timestamp, double ElapsedMs)> _recentRequests = new();
 
+        public string ApiName { get; }
         public int TotalRequests { get; private set; }
         public double TotalResponseTimeMs { get; private set; }
         public int FastCount { get; private set; }
         public int AverageCount { get; private set; }
         public int SlowCount { get; private set; }
         public double AverageResponseTime { get; private set; }
+        public IReadOnlyList<(DateTime Timestamp, double ElapsedMs)> RecentRequests => _recentRequests.AsReadOnly();
 
-        public Statistics(int totalRequests, double totalResponseTimeMs, int fastCount, int averageCount, int slowCount, double averageResponseTime)
+        public Statistics(string apiName, int totalRequests, double totalResponseTimeMs, int fastCount, int averageCount, int slowCount, double averageResponseTime)
         {
+            ApiName = apiName;
             TotalRequests = totalRequests;
             TotalResponseTimeMs = totalResponseTimeMs;
             FastCount = fastCount;
@@ -21,9 +24,9 @@
             AverageResponseTime = averageResponseTime;
         }
 
-        public static Statistics Initialize()
+        public static Statistics Initialize(string apiName)
         {
-            return new Statistics(0, 0, 0, 0, 0, 0);
+            return new Statistics(apiName, 0, 0, 0, 0, 0, 0);
         }
 
         public void Update(double elapsedMs)
@@ -49,10 +52,15 @@
             var time = DateTime.UtcNow.AddMinutes(-minutes);
             var recent = _recentRequests.Where(x => x.Timestamp >= time).ToList();
 
-            if (!recent.Any()) 
+            if (!recent.Any())
                 return 0;
 
             return recent.Average(x => x.ElapsedMs);
+        }
+
+        public void AddRecentRequest(DateTime timestamp, double elapsedMs)
+        {
+            _recentRequests.Add((timestamp, elapsedMs));
         }
     }
 }

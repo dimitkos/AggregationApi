@@ -47,13 +47,19 @@ namespace Application.Jobs
         //add in a utility interface
         private Statistics MapTo(StatisticsModel statisticsModel)
         {
-            return new Statistics(
-                    totalRequests: statisticsModel.TotalRequests,
-                    totalResponseTimeMs: statisticsModel.TotalResponseTimeMs,
-                    fastCount: statisticsModel.FastCount,
-                    averageCount: statisticsModel.AverageCount,
-                    slowCount: statisticsModel.SlowCount,
-                    averageResponseTime: statisticsModel.AverageResponseTime);
+            var stat = new Statistics(
+                apiName: statisticsModel.ApiName,
+                totalRequests: statisticsModel.TotalRequests,
+                totalResponseTimeMs: statisticsModel.TotalResponseTimeMs,
+                fastCount: statisticsModel.FastCount,
+                averageCount: statisticsModel.AverageCount,
+                slowCount: statisticsModel.SlowCount,
+                averageResponseTime: statisticsModel.AverageResponseTime);
+
+            foreach (var req in statisticsModel.RecentRequests)
+                stat.AddRecentRequest(req.Timestamp, req.ElapsedMs);
+
+            return stat;
         }
     }
 }
