@@ -18,6 +18,7 @@ namespace Infrastructure.Persistence.Commands.Aggregates
         {
             using var context = new AggreegationDbContext(_options);
 
+            //just in our case with more static data and with no high volume of records in the database
             var existingCommentIds = context.Comments
                 .Select(comment => comment.Id)
                 .ToHashSet();
@@ -27,11 +28,11 @@ namespace Infrastructure.Persistence.Commands.Aggregates
                 .ToHashSet();
 
             var newComments = aggregates.Comments
-                .Where(c => !existingCommentIds.Contains(c.Id))
+                .Where(comment => !existingCommentIds.Contains(comment.Id))
                 .ToList();
 
             var newRecipes = aggregates.Recipes
-                .Where(r => !existingRecipeIds.Contains(r.Id))
+                .Where(recipe => !existingRecipeIds.Contains(recipe.Id))
                 .ToList();
 
             context.Comments.AddRange(aggregates.Comments);

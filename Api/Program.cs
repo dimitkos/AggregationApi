@@ -48,28 +48,7 @@ namespace Api
         {
             services.AddControllers();
 
-            services.AddHttpClient(Constants.HttpClients.Comments)
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-
-            services.AddHttpClient(Constants.HttpClients.Recipes)
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
-                .AddTransientHttpErrorPolicy(policyBuilder =>
-                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
-
-            services.AddHttpClient(Constants.HttpClients.Weather, client =>
-            {
-                client.BaseAddress = new Uri("https://covid-19-statistics.p.rapidapi.com/");
-                client.DefaultRequestHeaders.Add("x-rapidapi-host", "open-weather13.p.rapidapi.com");
-                client.DefaultRequestHeaders.Add("x-rapidapi-key", "993951f1femsh7d3ffa8e32bde96p13bfbcjsn1a87a610f908");
-            })
-            .AddTransientHttpErrorPolicy(policyBuilder =>
-                policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
-            .AddTransientHttpErrorPolicy(policyBuilder =>
-                policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+            RegisterClients(services, configuration);
 
             services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(AutofacApplicationModule)));
 
@@ -134,6 +113,32 @@ namespace Api
 
             services
                 .AddDbContext<AggreegationDbContext>(options => options.UseSqlite(connectionString), ServiceLifetime.Transient);
+        }
+
+        private static void RegisterClients(IServiceCollection services, ConfigurationManager configuration)
+        {
+            services.AddHttpClient(Constants.HttpClients.Comments)
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+            services.AddHttpClient(Constants.HttpClients.Recipes)
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+                .AddTransientHttpErrorPolicy(policyBuilder =>
+                    policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+
+            //add secret in vault env variables etc
+            services.AddHttpClient(Constants.HttpClients.Weather, client =>
+            {
+                client.DefaultRequestHeaders.Add("x-rapidapi-host", "open-weather13.p.rapidapi.com");
+                client.DefaultRequestHeaders.Add("x-rapidapi-key", "993951f1femsh7d3ffa8e32bde96p13bfbcjsn1a87a610f908");
+            })
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.WaitAndRetryAsync(3, retryNumber => TimeSpan.FromMilliseconds(600)))
+            .AddTransientHttpErrorPolicy(policyBuilder =>
+                policyBuilder.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
         }
 
         private static void RegisterQuartz(IServiceCollection services, ConfigurationManager configuration)
