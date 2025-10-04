@@ -4,6 +4,8 @@ This project is an **API Aggregation Service** built with **ASP.NET Core (.NET 8
 It fetches and combines data from multiple external APIs (comments, recipes, weather), stores it in a local database, caches the results, and exposes a single unified API endpoint to access the aggregated data 
 and another endpoint that previews the statistics of the external APIs.
 
+There is also a background job that detects anomalies in the external api calls response tim,e comparing with the average time
+
 
 ## 🚀 How to Run
 
