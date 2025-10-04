@@ -1,3 +1,6 @@
+
+![Build](https://github.com/dimitkos/AggregationApi/actions/workflows/dotnet.yml/badge.svg)
+![.NET](https://img.shields.io/badge/.NET-8.0-blueviolet)
 ## API Aggregation Service (.NET 8)
 
 This project is an **API Aggregation Service** built with **ASP.NET Core (.NET 8)**.  
