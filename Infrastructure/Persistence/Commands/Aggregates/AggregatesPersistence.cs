@@ -35,8 +35,12 @@ namespace Infrastructure.Persistence.Commands.Aggregates
                 .Where(recipe => !existingRecipeIds.Contains(recipe.Id))
                 .ToList();
 
-            context.Comments.AddRange(aggregates.Comments);
-            context.Recipes.AddRange(aggregates.Recipes);
+            if(newComments.Count != 0 )
+                context.Comments.AddRange(aggregates.Comments);
+
+            if (newRecipes.Count != 0)
+                context.Recipes.AddRange(aggregates.Recipes);
+
             context.Weather.Add(aggregates.Weather);
 
             await context.SaveChangesAsync();

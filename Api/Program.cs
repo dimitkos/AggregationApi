@@ -82,10 +82,7 @@ namespace Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.MapControllers();
 
             app.Run();
         }
