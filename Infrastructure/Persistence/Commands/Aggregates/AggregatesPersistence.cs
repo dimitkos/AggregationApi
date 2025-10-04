@@ -35,7 +35,7 @@ namespace Infrastructure.Persistence.Commands.Aggregates
                 .Where(recipe => !existingRecipeIds.Contains(recipe.Id))
                 .ToList();
 
-            if(newComments.Count != 0 )
+            if (newComments.Count != 0)
                 context.Comments.AddRange(aggregates.Comments);
 
             if (newRecipes.Count != 0)
