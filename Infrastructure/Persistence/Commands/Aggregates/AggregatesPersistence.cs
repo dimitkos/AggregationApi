@@ -2,7 +2,6 @@
 using Domain.Aggregates;
 using Infrastructure.Persistence.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
-using Shared;
 
 namespace Infrastructure.Persistence.Commands.Aggregates
 {
@@ -18,6 +17,22 @@ namespace Infrastructure.Persistence.Commands.Aggregates
         public async Task StoreAllAggregates(AggregationEntity aggregates)
         {
             using var context = new AggreegationDbContext(_options);
+
+            var existingCommentIds = context.Comments
+                .Select(comment => comment.Id)
+                .ToHashSet();
+
+            var existingRecipeIds = context.Recipes
+                .Select(recipe => recipe.Id)
+                .ToHashSet();
+
+            var newComments = aggregates.Comments
+                .Where(c => !existingCommentIds.Contains(c.Id))
+                .ToList();
+
+            var newRecipes = aggregates.Recipes
+                .Where(r => !existingRecipeIds.Contains(r.Id))
+                .ToList();
 
             context.Comments.AddRange(aggregates.Comments);
             context.Recipes.AddRange(aggregates.Recipes);
