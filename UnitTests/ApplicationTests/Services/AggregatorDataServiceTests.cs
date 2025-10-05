@@ -1,6 +1,5 @@
 ﻿using Application.Services;
 using Application.Services.Infrastructure;
-using Domain.Aggregates;
 using Gateway;
 using Gateway.Api;
 using Microsoft.Extensions.Options;
@@ -28,7 +27,7 @@ namespace UnitTests.ApplicationTests.Services
             var cacheAdapterMock = new Mock<ICacheAdapter<string, AggregationModel>>();
             var persistenceMock = new Mock<IAggregatesPersistence>();
 
-            var config = new ApiConfiguration { CommentsUrl = "comments", RecipesUrl = "recipes" , WeatherUrl = "weather" };
+            var config = new ApiConfiguration { CommentsUrl = "comments", RecipesUrl = "recipes", WeatherUrl = "weather" };
             var optionsMock = new Mock<IOptions<ApiConfiguration>>();
             optionsMock.Setup(o => o.Value).Returns(config);
 
@@ -75,7 +74,7 @@ namespace UnitTests.ApplicationTests.Services
                 cacheAdapterMock.Object,
                 commentApiMock.Object,
                 recipeApiMock.Object,
-                weatherApiMock.Object, 
+                weatherApiMock.Object,
                 persistenceMock.Object,
                 optionsMock.Object);
 

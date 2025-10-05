@@ -36,7 +36,7 @@ namespace Shared
 
     public class RecipesResponse
     {
-        public List<RecipeModel> Recipes { get;}
+        public List<RecipeModel> Recipes { get; }
 
         [JsonConstructor]
         public RecipesResponse(List<RecipeModel> recipes)
