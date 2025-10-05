@@ -18,7 +18,7 @@ namespace UnitTests.ApplicationTests.Services
             var recipes = new List<RecipeModel> { new RecipeModel(1, "recipe", 10, 20, "Easy", "Italian", 100) };
             var recipesResponse = new RecipesResponse(recipes);
             var main = new Main(67.3, 55);
-            var weather = new WeatherModel ("Athens", main);
+            var weather = new WeatherModel("Athens", main);
 
             var commentApiMock = new Mock<IApiClient<List<CommentModel>>>();
             var recipeApiMock = new Mock<IApiClient<RecipesResponse>>();
@@ -68,7 +68,7 @@ namespace UnitTests.ApplicationTests.Services
 
             commentApiMock.Setup(x => x.Get(config.CommentsUrl, It.IsAny<string>(), null)).ReturnsAsync(new List<CommentModel>());
             recipeApiMock.Setup(x => x.Get(config.RecipesUrl, It.IsAny<string>(), null)).ReturnsAsync(new RecipesResponse(new List<RecipeModel>()));
-            weatherApiMock.Setup(x => x.Get(config.WeatherUrl, It.IsAny<string>(), null)).ReturnsAsync(new WeatherModel(string.Empty,new Main(default, default)));
+            weatherApiMock.Setup(x => x.Get(config.WeatherUrl, It.IsAny<string>(), null)).ReturnsAsync(new WeatherModel(string.Empty, new Main(default, default)));
 
             var service = new AggregatorDataService(
                 cacheAdapterMock.Object,
