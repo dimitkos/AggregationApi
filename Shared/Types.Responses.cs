@@ -102,20 +102,32 @@ namespace Shared
     public class WeatherModel
     {
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; }
 
         [JsonPropertyName("main")]
-        public Main Main { get; set; }
+        public Main Main { get; }
 
         public double Temp => Main.Temp;
         public double Humidity => Main.Humidity;
+
+        public WeatherModel(string name, Main main)
+        {
+            Name = name;
+            Main = main;
+        }
     }
 
     public class Main
     {
         [JsonPropertyName("temp")]
-        public double Temp { get; set; }
+        public double Temp { get; }
         [JsonPropertyName("humidity")]
-        public double Humidity { get; set; }
+        public double Humidity { get; }
+
+        public Main(double temp, double humidity)
+        {
+            Temp = temp;
+            Humidity = humidity;
+        }
     }
 }
