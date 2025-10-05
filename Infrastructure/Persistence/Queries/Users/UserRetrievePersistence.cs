@@ -18,7 +18,7 @@ namespace Infrastructure.Persistence.Queries.Users
         {
             using var context = new AggreegationDbContext(_options);
 
-            var user = await context.Users.FirstOrDefaultAsync(x=> x.Email == key);
+            var user = await context.Users.FirstOrDefaultAsync(x => x.Email == key);
 
             return user;
         }

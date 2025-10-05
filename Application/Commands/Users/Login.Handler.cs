@@ -30,7 +30,7 @@ namespace Application.Commands.Users
 
             var verified = _hasher.Verify(request.Payload.Password, user.Password);
 
-            if(!verified)
+            if (!verified)
                 throw new Exception("Invalid credentials");
 
             var token = _tokenProvider.Create(user);
